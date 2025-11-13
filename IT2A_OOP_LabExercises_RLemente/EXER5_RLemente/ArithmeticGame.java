@@ -6,7 +6,6 @@ import java.util.List;
 import javax.swing.*;
 
 public class ArithmeticGame extends JFrame implements ActionListener {
-
     // --- Card Identifiers ---
     private static final String WELCOME_CARD = "WELCOME";
     private static final String MODE_CARD = "MODE_SELECTION";
@@ -14,23 +13,23 @@ public class ArithmeticGame extends JFrame implements ActionListener {
     private static final String RESULTS_CARD = "RESULTS";
 
     // --- Colors & Fonts (Balanced Palette) ---
-    private static final Color PRIMARY_BLUE = new Color(79, 114, 205); // Moderate Blue
-    private static final Color PRIMARY_ORANGE = new Color(255, 128, 0); 
+    private static final Color PRIMARY_BLUE = new Color(79, 114, 205);
+    private static final Color PRIMARY_ORANGE = new Color(255, 128, 0);
     private static final Color DARK_TEXT = new Color(20, 30, 40);
-    private static final Color LIGHT_BACKGROUND = Color.WHITE; // Use pure white for core panels
-    private static final Color PALE_BLUE = new Color(220, 235, 255); // Pale background for gradients
-    private static final Color SUCCESS_GREEN = new Color(46, 125, 50); // Deep Green
-    private static final Color LIME_GREEN = new Color(139, 195, 74); 
+    private static final Color LIGHT_BACKGROUND = Color.WHITE;
+    private static final Color PALE_BLUE = new Color(220, 235, 255);
+    private static final Color SUCCESS_GREEN = new Color(46, 125, 50);
+    private static final Color LIME_GREEN = new Color(139, 195, 74);
     private static final Color WARNING_YELLOW = new Color(255, 193, 7);
-    private static final Color DANGER_RED = new Color(211, 47, 47); // Deeper Red
-    private static final Color ACCENT_TEAL = new Color(0, 131, 143); // Darker Teal for timer/accents
-    private static final Color PURPLE_ACCENT = new Color(94, 53, 177); // Deep Purple for buttons
+    private static final Color DANGER_RED = new Color(211, 47, 47);
+    private static final Color ACCENT_TEAL = new Color(0, 131, 143);
+    private static final Color PURPLE_ACCENT = new Color(94, 53, 177);
 
-    private final Font TITLE_FONT = new Font("Impact", Font.BOLD, 75); 
-    private final Font HEADER_FONT = new Font("Verdana", Font.BOLD, 32); 
-    private final Font BUTTON_FONT = new Font("Arial", Font.BOLD, 20); 
+    private final Font TITLE_FONT = new Font("Impact", Font.BOLD, 75);
+    private final Font HEADER_FONT = new Font("Verdana", Font.BOLD, 32);
+    private final Font BUTTON_FONT = new Font("Arial", Font.BOLD, 20);
     private final Font PROBLEM_FONT = new Font("Monospaced", Font.BOLD, 65);
-    private final Font SYMBOL_FONT = new Font("Arial", Font.BOLD, 40); // Font for background symbols
+    private final Font SYMBOL_FONT = new Font("Arial", Font.BOLD, 40);
 
     // --- Core UI Components ---
     private final CardLayout cardLayout;
@@ -40,17 +39,17 @@ public class ArithmeticGame extends JFrame implements ActionListener {
     private JPanel digitContainerPanel;
     private List<JButton> digitButtons;
     private JProgressBar progressBar;
-    private JButton hintButton; 
+    private JButton hintButton;
 
     // --- Game State ---
     private int score = 0, totalItems, currentProblemIndex, correctAnswer, difficultyMax;
     private String operator;
-    private int hintsRemaining = 0; 
+    private int hintsRemaining = 0;
     private final Random random = new Random();
     private final List<Integer> correctAnswersList = new ArrayList<>();
     private final List<Integer> userAnswersList = new ArrayList<>();
-    
-    private javax.swing.Timer countdownTimer; 
+
+    private javax.swing.Timer countdownTimer;
     private int timeLeft;
     private int streak = 0;
 
@@ -481,34 +480,49 @@ public class ArithmeticGame extends JFrame implements ActionListener {
         startTimer();
     }
 
-    private void generateProblem() {
+   private void generateProblem() {
         scoreLabel.setText(String.format("Item %d / %d", currentProblemIndex + 1, totalItems));
         progressBar.setValue(currentProblemIndex);
-        answerField.setText(""); 
+        answerField.setText("");
         feedbackLabel.setText("Click the tiles to build the answer.");
 
         int max = difficultyMax, min = 1;
-        int op1 = random.nextInt(max)+min, op2 = random.nextInt(max)+min;
-        
-        if(max <= 10){ 
-            operator = random.nextBoolean() ? "+" : "-"; 
-            if(operator.equals("-") && op1 < op2) {
-                int t = op1; op1 = op2; op2 = t;
-            } 
-        } else { 
-            String[] ops = {"+", "-", "*", "/"}; 
-            operator = ops[random.nextInt(4)]; 
+        int op1 = random.nextInt(max) + min, op2 = random.nextInt(max) + min;
+
+        if (max <= 10) {
+            operator = random.nextBoolean() ? "+" : "-";
+            if (operator.equals("-") && op1 < op2) {
+                int t = op1;
+                op1 = op2;
+                op2 = t;
+            }
+        } else {
+            // ✅ Added "%" operator here
+            String[] ops = {"+", "-", "*", "/", "%"};
+            operator = ops[random.nextInt(5)];
         }
 
-        switch(operator){
-            case"+": correctAnswer = op1 + op2; break;
-            case"-": correctAnswer = op1 - op2; break;
-            case"*": correctAnswer = op1 * op2; break;
-            case"/": 
-                correctAnswer = op1 / op2; 
-                op1 = correctAnswer * op2; 
+        switch (operator) {
+            case "+":
+                correctAnswer = op1 + op2;
+                break;
+            case "-":
+                correctAnswer = op1 - op2;
+                break;
+            case "*":
+                correctAnswer = op1 * op2;
+                break;
+            case "/":
+                if (op2 == 0) op2 = 1;
+                correctAnswer = op1 / op2;
+                op1 = correctAnswer * op2;
+                break;
+            case "%":
+                if (op2 == 0) op2 = 1;
+                correctAnswer = op1 % op2;
                 break;
         }
+
 
         problemLabel.setText(String.format("%d %s %d",op1,operator,op2));
 
